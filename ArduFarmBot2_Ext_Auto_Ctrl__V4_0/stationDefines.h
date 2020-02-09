@@ -1,6 +1,6 @@
 
 /* Automatic Control Parameters Definition */
-#define DRY_SOIL      66
+#define DRY_SOIL      50
 #define WET_SOIL      85
 #define COLD_TEMP     12
 #define HOT_TEMP      22
@@ -12,7 +12,7 @@
 #define READ_SOIL_TEMP_TM 2L
 #define READ_SOIL_HUM_TM  10L
 #define READ_AIR_DATA_TM  2L
-#define SEND_UP_DATA_TM   10L
+#define SEND_UP_DATA_TM   5L
 #define AUTO_CTRL_TM      60L     
 
 /* OLED */
@@ -22,8 +22,8 @@ boolean turnOffOLED = 1;
 /* DHT22*/
 //#define DHTPIN D3  
 //#define DHTTYPE DHT22 
-#define BME_SDA 4
-#define BME_SCL 3
+#define BME_SDA D1
+#define BME_SCL D2
 #define BME_ADDR 0x76
 float airHum = 0;
 float airTemp = 0;
