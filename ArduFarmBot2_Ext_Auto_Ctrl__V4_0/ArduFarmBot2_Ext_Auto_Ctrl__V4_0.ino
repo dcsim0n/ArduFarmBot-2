@@ -19,7 +19,7 @@
  ********************************************************************************************************************************/
 #define SW_VERSION "   SW Ver. 4.0" // SW version will appears at innitial LCD Display
 #include "stationDefines.h"       // Project definitions
-#include "stationCredentials.h"
+#include "secret.h"
 
 /* ESP & Blynk */
 #define BLYNK_PRINT Serial    // Comment this out to disable prints and save space
@@ -31,17 +31,21 @@ WidgetLED LAMPs(V1);  // Echo signal to Sensors Tab at Blynk App
 WidgetLED LAMPa(V6); // Echo signal to Actuators Tab at Blynk App
 
 /* TIMER */
-#include <SimpleTimer.h>
+//#include <SimpleTimer.h>
 SimpleTimer timer;
 
 /* OLED */
 #include <ACROBOTIC_SSD1306.h> // library for OLED: SCL ==> D1; SDA ==> D2
 #include <SPI.h>
-#include <Wire.h>
 
 /* DHT22*/
-#include "DHT.h"
-DHT dht(DHTPIN, DHTTYPE);
+//#include "DHT.h"
+//DHT dht(DHTPIN, DHTTYPE);
+#include <Wire.h>
+#include <Adafruit_BME280.h>
+Adafruit_BME280 bme;
+
+
 
 /* DS18B20 Temperature Sensor */
 #include <OneWire.h>
@@ -66,7 +70,10 @@ void setup()
   
   Blynk.begin(auth, ssid, pass);
   oledStart();
-  dht.begin();
+  //dht.begin();
+  Wire.begin(BME_SDA, BME_SCL); 
+  bme.begin(BME_ADDR, &Wire);
+
   DS18B20.begin();
 
   PUMPs.off();
@@ -234,5 +241,3 @@ void sendUptime()
   Blynk.virtualWrite(12, soilMoister); // virtual pin V12
   Blynk.virtualWrite(13, soilTemp); //virtual pin V13
 }
-
-
