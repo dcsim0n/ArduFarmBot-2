@@ -41,11 +41,14 @@ SimpleTimer timer;
 #include <SPI.h>
 
 /* DHT22*/
-//#include "DHT.h"
-//DHT dht(DHTPIN, DHTTYPE);
-#include <Wire.h>
-#include <Adafruit_BME280.h>
-Adafruit_BME280 bme;
+#if USE_BME
+  #include <Wire.h>
+  #include <Adafruit_BME280.h>
+  Adafruit_BME280 bme;
+#else
+  #include "DHT.h"
+  DHT dht(DHTPIN, DHTTYPE);
+#endif
 
 
 
@@ -73,9 +76,13 @@ void setup()
   
   Blynk.begin(auth, ssid, pass);
   oledStart();
-  //dht.begin();
-  Wire.begin(BME_SDA, BME_SCL); 
-  bme.begin(BME_ADDR, &Wire);
+  
+  #if USE_BME
+    Wire.begin(BME_SDA, BME_SCL); 
+    bme.begin(BME_ADDR, &Wire);
+  #else
+    dht.begin();
+  #endif
 
   DS18B20.begin();
 
@@ -83,6 +90,7 @@ void setup()
   LAMPs.off();
   PUMPa.off();
   LAMPa.off();
+  LIGHTs.off();
   
   digitalWrite(PUMP_PIN, HIGH); // To be used with Relay module (inverted logic: normally HIGH)
   digitalWrite(LAMP_PIN, HIGH); // To be used with Relay module (inverted logic: normally HIGH)
@@ -103,13 +111,16 @@ void loop()
 /****************************************************************
 * Read remote commands 
 ****************************************************************/
-BLYNK_WRITE(2)
+BLYNK_WRITE(2) //Lighting remote control
 {
   int i=param.asInt();
   if(i==1)
   {
-    lightStatus = !lightStatus;
-    aplyCmd();
+    digitalWrite(LIGHT_PIN,HIGH);
+  }
+  if(i==0)
+  {
+    digitalWrite(LIGHT_PIN,LOW);
   }
 }
 BLYNK_WRITE(3) // Pump remote control

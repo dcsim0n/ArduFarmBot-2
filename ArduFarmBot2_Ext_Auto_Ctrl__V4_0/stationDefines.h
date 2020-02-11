@@ -20,8 +20,10 @@ boolean turnOffOLED = 1;
 #define SHOW_SET_UP   30
 
 /* DHT22*/
-//#define DHTPIN D3  
-//#define DHTTYPE DHT22 
+#define USE_BME true
+#define DHTPIN D3  
+#define DHTTYPE DHT22 
+/* BME 280 */
 #define BME_SDA D1
 #define BME_SCL D2
 #define BME_ADDR 0x76
