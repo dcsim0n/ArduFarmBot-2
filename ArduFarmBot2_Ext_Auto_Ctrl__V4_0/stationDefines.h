@@ -40,8 +40,10 @@ float soilTemp;
 /* Relays */
 #define PUMP_PIN D6              //PUMP (Red LED)
 #define LAMP_PIN D7              //LAMP (Green LED)
+#define LIGHT_PIN D0
 boolean pumpStatus = 0;
 boolean lampStatus = 0;
+boolean lightStatus = 0;
 
 /* Buttons */
 #define PUMP_ON_BUTTON D9        //push-button PUMP (Red)

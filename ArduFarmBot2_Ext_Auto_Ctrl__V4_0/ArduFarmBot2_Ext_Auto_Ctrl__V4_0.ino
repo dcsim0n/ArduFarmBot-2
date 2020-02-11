@@ -29,6 +29,8 @@ WidgetLED PUMPs(V0);  // Echo signal to Sensors Tab at Blynk App
 WidgetLED PUMPa(V5); // Echo signal to Actuators Tab at Blynk App
 WidgetLED LAMPs(V1);  // Echo signal to Sensors Tab at Blynk App
 WidgetLED LAMPa(V6); // Echo signal to Actuators Tab at Blynk App
+WidgetLED LIGHTa(V7);
+
 
 /* TIMER */
 //#include <SimpleTimer.h>
@@ -65,6 +67,7 @@ void setup()
   pinMode(LAMP_PIN, OUTPUT);
   pinMode(PUMP_ON_BUTTON, INPUT_PULLUP);
   pinMode(LAMP_ON_BUTTON, INPUT_PULLUP);
+  pinMode(LIGHT_PIN, OUTPUT);
   pinMode(SENSORS_READ_BUTTON, INPUT_PULLUP);
   pinMode(soilMoisterVcc, OUTPUT);
   
@@ -80,8 +83,10 @@ void setup()
   LAMPs.off();
   PUMPa.off();
   LAMPa.off();
+  
   digitalWrite(PUMP_PIN, HIGH); // To be used with Relay module (inverted logic: normally HIGH)
   digitalWrite(LAMP_PIN, HIGH); // To be used with Relay module (inverted logic: normally HIGH)
+  digitalWrite(LIGHT_PIN, HIGH);
   digitalWrite (soilMoisterVcc, LOW);
   
   waitButtonPress (SHOW_SET_UP); // Wait for Sensor Button to be pressed 
@@ -98,6 +103,15 @@ void loop()
 /****************************************************************
 * Read remote commands 
 ****************************************************************/
+BLYNK_WRITE(2)
+{
+  int i=param.asInt();
+  if(i==1)
+  {
+    lightStatus = !lightStatus;
+    aplyCmd();
+  }
+}
 BLYNK_WRITE(3) // Pump remote control
 {
   int i=param.asInt();
@@ -111,7 +125,7 @@ BLYNK_WRITE(3) // Pump remote control
 BLYNK_WRITE(4) // Lamp remote control
 {
   int i=param.asInt();
-  if (i==1) 
+  if (i==1)
   {
     lampStatus = !lampStatus;
     aplyCmd();
@@ -188,6 +202,19 @@ void aplyCmd()
         if (!turnOffOLED) displayData();
         LAMPs.off();
         LAMPa.off();
+      }
+  if (lightStatus == 1) 
+  {
+    Blynk.notify("ArduFarmBot2: Warning ==>> Light ON");
+    digitalWrite(LIGHT_PIN, LOW); // To be used with Relay module (inverted logic: activate with LOW)
+    if (!turnOffOLED) displayData();
+    LIGHTa.on();
+  }
+  else
+      {
+        digitalWrite(LIGHT_PIN, HIGH); // To be used with Relay module (inverted logic: normally HIGH)
+        if (!turnOffOLED) displayData();
+        LIGHTa.off();
       }
 }
 
