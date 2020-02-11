@@ -32,7 +32,7 @@ void getSoilMoisterData(void)
   }
   digitalWrite (soilMoisterVcc, LOW);
   soilMoister = soilMoister/N; 
-  soilMoister = map(soilMoister, 600, 0, 0, 100); //LM393 on 5V (+Vin)
+  soilMoister = map(soilMoister, 0, 1024, 0, 100); //LM393 on 5V (+Vin)
 }
 
 /***************************************************
