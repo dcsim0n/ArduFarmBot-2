@@ -30,7 +30,10 @@ WidgetLED PUMPa(V5); // Echo signal to Actuators Tab at Blynk App
 WidgetLED LAMPs(V1);  // Echo signal to Sensors Tab at Blynk App
 WidgetLED LAMPa(V6); // Echo signal to Actuators Tab at Blynk App
 WidgetLED LIGHTa(V7);
+WiFiClient espClient;
 
+#include <PubSubClient.h>
+PubSubClient client(espClient);
 
 /* TIMER */
 //#include <SimpleTimer.h>
@@ -55,6 +58,29 @@ Adafruit_BME280 bme;
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature DS18B20(&oneWire);
 
+void setup_wifi() {
+
+  delay(10);
+  // We start by connecting to a WiFi network
+  Serial.println();
+  Serial.print("Connecting to ");
+  Serial.println(ssid);
+
+  WiFi.begin(ssid, pass);
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  randomSeed(micros());
+
+  Serial.println("");
+  Serial.println("WiFi connected");
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
+}
+
 void setup()
 {
   Serial.begin(115200);
@@ -71,7 +97,7 @@ void setup()
   pinMode(SENSORS_READ_BUTTON, INPUT_PULLUP);
   pinMode(soilMoisterVcc, OUTPUT);
   
-  Blynk.begin(auth, ssid, pass);
+  setup_wifi();
   oledStart();
   //dht.begin();
   Wire.begin(BME_SDA, BME_SCL); 
@@ -94,10 +120,69 @@ void setup()
   startTimers();
 }
 
+void reconnect() {
+  // Loop until we're reconnected
+  while (!client.connected()) {
+    Serial.print("Attempting MQTT connection...");
+    // Create a random client ID
+    String clientId = "ESP8266Client-";
+    clientId += String(random(0xffff), HEX);
+    // Attempt to connect
+    if (client.connect(clientId.c_str(), mqtt_user, mqtt_pass)) {
+      Serial.println("connected");
+      // ... and resubscribe
+      client.subscribe("/missionControl/lightStatus");
+    } else {
+      Serial.print("failed, rc=");
+      Serial.print(client.state());
+      Serial.println(" try again in 5 seconds");
+      // Wait 5 seconds before retrying
+      delay(5000);
+    }
+  }
+}
+
+void callback(char* topic, byte* payload, unsigned int length) {
+  Serial.print("Message arrived [");
+  Serial.print(topic);
+  Serial.print("] ");
+  for (int i = 0; i < length; i++) {
+    Serial.print((char)payload[i]);
+  }
+  Serial.println();
+
+  // Switch on the LED if an 1 was received as first character
+  if ((char)payload[0] == '1') {
+//if (lampStatus == 1) 
+//  {
+//    Blynk.notify("ArduFarmBot2: Warning ==>> Lamp ON");
+//    digitalWrite(LAMP_PIN, LOW); // To be used with Relay module (inverted logic: activate with LOW)
+//    if (!turnOffOLED) displayData();
+//    LAMPs.on();
+//    LAMPa.on();
+//  }
+    digitalWrite(LIGHT_PIN, LOW);   // Turn the LED on (Note that LOW is the voltage level
+    if(!turnOffOLED) displayData();
+    LIGHTa.on();
+    // but actually the LED is on; this is because
+    // it is active low on the ESP-01)
+  } else {
+    digitalWrite(LIGHT_PIN, HIGH);  // Turn the LED off by making the voltage HIGH
+    if(!turnOffOLED) displayData();
+    LIGHTa.off();
+  }
+
+}
+
 void loop()
 {
   timer.run(); // Initiates SimpleTimer
   Blynk.run();
+
+  if(!client.connected()){
+    reconnect();
+  }
+  client.loop();
 }
 
 /****************************************************************

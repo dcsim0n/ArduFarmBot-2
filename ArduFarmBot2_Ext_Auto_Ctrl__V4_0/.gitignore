@@ -1,4 +1,6 @@
 # Ignore these files
 secret.h
-
+*.bin
+*.elf
+*.exe
 .vscode/
