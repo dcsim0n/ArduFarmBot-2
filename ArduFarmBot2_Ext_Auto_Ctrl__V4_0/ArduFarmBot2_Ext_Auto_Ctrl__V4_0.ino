@@ -19,6 +19,15 @@
  ********************************************************************************************************************************/
 #define SW_VERSION "   SW Ver. 4.0" // SW version will appears at innitial LCD Display
 #include "stationDefines.h"       // Project definitions
+
+// * MUST HAVE A SECRET.H FILE WITH THE FOLLOWING DEFINES * //
+//const char auth[] 
+//const char ssid[]  
+//const char pass[]  
+
+//const char* mqtt_server 
+//const char* mqtt_user 
+//const char* mqtt_pass 
 #include "secret.h"
 
 /* ESP & Blynk */
